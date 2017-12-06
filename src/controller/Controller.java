@@ -14,9 +14,19 @@ public class Controller {
 		this.frameIP = frameIP;
 	}
 	
-	public Controller(FrameIPAddress frameIP, Server server) {
+	public Controller (Server server) {
+		this.server = server;
+	}
+	
+	public Controller(FrameIPAddress frameIP, Server server) throws IOException{
 		this.frameIP = frameIP;
 		this.server = server;
+		this.server.accept();
+		frameIP.setController(this);
+	}
+	
+	public Server getServer() {
+		return server;
 	}
 	
 	public void setMainFrame(MainFrame frameMain) {
@@ -30,7 +40,7 @@ public class Controller {
 	public void initializeNode(String ipAddress, String region) {
 		try {
 			client = new Client(ipAddress, region, this);
-			frameIP.dispose();
+			//frameIP.dispose();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
