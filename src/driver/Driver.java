@@ -1,8 +1,11 @@
 package driver;
-import view.MainFrame;
+import controller.Controller;
+import view.FrameIPAddress;
 
 public class Driver {
 	public static void main(String[] args) {
-		new MainFrame();
+		FrameIPAddress frameIP = new FrameIPAddress();
+		Controller controller = new Controller(frameIP);
+		frameIP.setController(controller);
 	}
 }
