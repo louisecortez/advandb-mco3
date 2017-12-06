@@ -1,7 +1,6 @@
 package controller;
 import view.*;
 import network.*;
-
 import java.io.IOException;
 
 public class Controller {
@@ -13,6 +12,11 @@ public class Controller {
 	
 	public Controller(FrameIPAddress frameIP) {
 		this.frameIP = frameIP;
+	}
+	
+	public Controller(FrameIPAddress frameIP, Server server) {
+		this.frameIP = frameIP;
+		this.server = server;
 	}
 	
 	public void setMainFrame(MainFrame frameMain) {
