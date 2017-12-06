@@ -5,6 +5,7 @@ import network.Client;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class FrameIPAddress extends JFrame {
 	private static final int WIDTH = 500;
@@ -17,7 +18,7 @@ public class FrameIPAddress extends JFrame {
     private JTextField tfIPAddress;
     private JComboBox ddNodes;
     
-    public FrameIPAddress() {
+    public FrameIPAddress(Controller controller) {
     	pane = getContentPane();
 		pane.setLayout(new GridLayout(3, 1));
 		pane.setBackground(Color.WHITE);
@@ -33,7 +34,13 @@ public class FrameIPAddress extends JFrame {
 		btnConfirm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
+					
+				if (controller != null)
+				
 				controller.initializeNode(tfIPAddress.getText().toString(), ddNodes.getSelectedItem().toString());
+				else
+					System.out.println("WOO THERE IS NO CONTROLLER");
 			}
 		});
 		
