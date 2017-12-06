@@ -7,17 +7,24 @@ import view.FrameIPAddress;
 import network.*; 
  
 public class Driver {
- 	public static void main(String[] args) {
+ 	public static void main(String[] args) throws IOException {
 
- 		try {
+ 		
 			Server s = new Server();
-			FrameIPAddress frameIP = new FrameIPAddress();
-			Controller controller = new Controller(frameIP, s);
-			frameIP.setController(controller);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			
+			new FrameIPAddress(new Controller(s));
+			s.accept();
+			
+			/*
+			Controller controller = new Controller(frameIP);
+			if (controller != null) {
+				System.out.println("Good controller");
+				frameIP.setController(controller);
+				s.accept();
+			}
+			*/	
+			
+			
 		
  	}
  }
