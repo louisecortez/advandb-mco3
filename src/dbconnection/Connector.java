@@ -15,6 +15,20 @@ public class Connector {
 	private static String username;
 	private static String password;
 	
+	public Connector(String dbName) {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		this.driver = "com.mysql.jdbc.Connector"; //com.mysql.jdbc.DriverManager
+		this.url = "jdbc:mysql://localhost:3306/"; //jdbc.mysql://127.0.0.1:3306/
+		this.schema = dbName; //db_hpq
+		this.username = "root"; //root
+		this.password = "1234";
+	}
+	
+	
 	public Connector(String url, String schema, String driver, String username, String password) {
 		this.url = url;
 		this.schema = schema;
@@ -22,6 +36,20 @@ public class Connector {
 		this.username = username;
 		this.password = password;
 	}
+	
+	public Connector(String schema, String password) {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		this.schema = "com.mysql.jdbc.Connector"; //com.mysql.jdbc.DriverManager
+		this.url = "jdbc:mysql://localhost:3306/"; //jdbc.mysql://127.0.0.1:3306/
+		this.schema = schema; //db_hpq
+		this.username = "root"; //root
+		this.password = password;
+	}
+
 	
 	public static Connection getConnection() {
 		Connection connection = null;
@@ -61,5 +89,21 @@ public class Connector {
 		}
 		
 		return result;
+	}
+	
+	public String getDriver() {
+		return driver;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 }
