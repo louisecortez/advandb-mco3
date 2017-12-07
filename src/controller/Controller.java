@@ -10,8 +10,13 @@ public class Controller {
 	private Server server;
 	private Client client;
 	
-	public Controller(FrameIPAddress frameIP) {
+	public Controller() throws IOException {
+		this.server = new Server();
+	}
+	
+	public Controller(FrameIPAddress frameIP) throws IOException {
 		this.frameIP = frameIP;
+		this.server = new Server();
 	}
 	
 	public Controller (Server server) {
@@ -21,7 +26,7 @@ public class Controller {
 	public Controller(FrameIPAddress frameIP, Server server) throws IOException{
 		this.frameIP = frameIP;
 		this.server = server;
-		this.server.accept();
+		//this.server.accept();
 		frameIP.setController(this);
 	}
 	
