@@ -324,20 +324,13 @@ public class Client {
 										while(rs.next()){
 											Entity cur = new Entity(
 													rs.getInt(1),
-													rs.getInt(2),
-													rs.getInt(3),
-													rs.getInt(4),
-													rs.getInt(5),
-													rs.getInt(6),
+													rs.getString(2),
+													rs.getString(3),
+													rs.getString(4),
+													rs.getString(5),
+													rs.getString(6),
 													rs.getInt(7),
-													rs.getInt(8),
-													rs.getInt(9),
-													rs.getInt(10),
-													rs.getInt(11),
-													rs.getInt(12),
-													rs.getInt(13),
-													rs.getInt(14),
-													rs.getInt(15));
+													rs.getInt(8));
 											entities.add(cur);
 										}
 										System.out.println("MAY RESULTSSSS");
@@ -477,20 +470,14 @@ public class Client {
 					while(rs.next()){
 						Entity cur = new Entity(
 								rs.getInt(1),
-								rs.getInt(2),
-								rs.getInt(3),
-								rs.getInt(4),
-								rs.getInt(5),
-								rs.getInt(6),
+								rs.getString(2),
+								rs.getString(3),
+								rs.getString(4),
+								rs.getString(5),
+								rs.getString(6),
 								rs.getInt(7),
-								rs.getInt(8),
-								rs.getInt(9),
-								rs.getInt(10),
-								rs.getInt(11),
-								rs.getInt(12),
-								rs.getInt(13),
-								rs.getInt(14),
-								rs.getInt(15));
+								rs.getInt(8));
+								
 						e.add(cur);
 					}
 				} catch (SQLException e1) {
