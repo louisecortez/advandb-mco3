@@ -1,9 +1,8 @@
 package model;
 
 public class Entity {
-	public static final int COLUMN_COUNT = 8;
-	public static final String[] HEADERS = { "id","CountryCode", "CountryName", "Region", "SeriesCode", "SeriesName", "YearC", "Data"};
-	private int id;
+	public static final int COLUMN_COUNT = 7;
+	public static final String[] HEADERS = {"CountryCode", "CountryName", "Region", "SeriesCode", "SeriesName", "YearC", "Data"};
 	private String countrycode;
 	private String countryname;
 	private String region;
@@ -13,10 +12,9 @@ public class Entity {
 	private int data;
 	
 	
-	public Entity(int id, String countrycode, String countryname, String region, String seriescode, String seriesname,
+	public Entity(String countrycode, String countryname, String region, String seriescode, String seriesname,
 			int yearc, int data) {
 		super();
-		this.id = id;
 		this.countrycode = countrycode;
 		this.countryname = countryname;
 		this.region = region;
@@ -26,11 +24,12 @@ public class Entity {
 		this.data = data;
 	}
 	
+	/*
 	public Entity(int id) {
 		super();
 		this.id = id;
 	}
-
+	 */
 	public String getCountrycode() {
 		return countrycode;
 	}
@@ -87,6 +86,7 @@ public class Entity {
 		this.data = data;
 	}
 
+	/*
 	public int getId() {
 		return id;
 	}
@@ -94,6 +94,7 @@ public class Entity {
 	public void setId(int id) {
 		this.id = id;
 	}
+	*/
 
 	/*
 	 * this.id = id;
@@ -108,12 +109,12 @@ public class Entity {
 	 * */
 	@Override
 	public String toString() {
-		return "Entity [id=" + id + ", countrycode=" + countrycode + ", countryname=" + countryname + ", region=" + region 
+		return "Entity [countrycode=" + countrycode + ", countryname=" + countryname + ", region=" + region 
 				+ ", seriescode=" + seriescode + ", seriesname=" + seriesname
 				+ ", yearc=" + yearc + ", data=" + data;
 	}
 
 	public Object[] toArray() {
-		return new Object[] { id, countrycode, countryname, region, seriescode, seriesname, yearc, data };
+		return new Object[] { countrycode, countryname, region, seriescode, seriesname, yearc, data };
 	}
 }
