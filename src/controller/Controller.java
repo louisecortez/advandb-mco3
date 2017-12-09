@@ -14,6 +14,8 @@ public class Controller {
 	private Server server;
 	private Client client;
 	
+	private String region;
+	
 	public Controller() throws IOException {
 		//this.server = new Server();
 	}
@@ -53,6 +55,7 @@ public class Controller {
 	public void initializeNode(String ipAddress, String region) {
 		try {
 			client = new Client(ipAddress, region, this);
+			this.region = region;
 			connector = new Connector("wdidb", "1234");
 			client.setConnector(connector);
 			frameMain.setController(this);
@@ -64,9 +67,20 @@ public class Controller {
 	}
 	
 	public void localRead(String table) throws SQLException {
-		String query = "SELECT * FROM " + "wdidb.all_regions";
+		String query = "SELECT * FROM " + table;
+		
+		if(region.equals(Client.FIRST_NODE)) {
+			query += ".europe_america";
+		} else if(region.equals(Client.SECOND_NODE)) {
+			query += ".asia_africa";
+		} else if(region.equals(Client.THIRD_NODE)) {
+			query += ".all_regions";
+		}
+		
 		ResultSet rs = connector.executeQuery(query);
 		System.out.println("Query executed!");
+		
+		frameMain.clearAllRows();
 		
 		while(rs.next()) {
 			String cc = rs.getString("CountryCode");
@@ -79,5 +93,9 @@ public class Controller {
 			
 			frameMain.addTableRow(new Object[] {cc, cn, r, sc, sn, y, d});
 		}
+	}
+	
+	public void localUpdate() {
+		
 	}
 }
