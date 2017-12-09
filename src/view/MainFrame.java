@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class MainFrame extends JFrame {
 	private Dimension dimensions = Toolkit.getDefaultToolkit().getScreenSize();
@@ -479,6 +480,16 @@ public class MainFrame extends JFrame {
 				String log = cbReadRegion.getSelectedItem().toString();
 				
 				taLogs.append("Read " + log + "\n");
+				
+				if(controller == null)
+					System.out.println("HELLO NULL");
+				
+				try {
+					controller.localRead("wdidb.all_regions");
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -509,11 +520,11 @@ public class MainFrame extends JFrame {
 	
 	public void addTableRow(Object[] rowData) {
 		// Dynamic table
-		model.addRow(new Object[] {"ABW", "Aruba", "Latin America & Caribbean",
-				"IS.SHP.GCNW.XQ", "Liner shipping connectivity index (maximum value in 2004 = 100)",
-				"2004", "7.370000000000000"});
-		
-		//model.addRow(rowData);
+//		model.addRow(new Object[] {"ABW", "Aruba", "Latin America & Caribbean",
+//				"IS.SHP.GCNW.XQ", "Liner shipping connectivity index (maximum value in 2004 = 100)",
+//				"2004", "7.370000000000000"});
+//		
+		model.addRow(rowData);
 	}
 	
 	class WindowClose extends WindowAdapter{
