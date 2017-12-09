@@ -3,7 +3,7 @@ package dbconnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.ResultSet;	
 import java.sql.Statement;
 
 
@@ -40,6 +40,7 @@ public class Connector {
 	public Connector(String schema, String password) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
+			System.out.println("Connection success!");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +56,7 @@ public class Connector {
 		Connection connection = null;
 		
 		try {
-			Class.forName(driver).newInstance();
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			connection = DriverManager.getConnection(url + schema, username, password);
 			return connection;
 		} catch(Exception e) {
@@ -80,6 +81,7 @@ public class Connector {
 	public static ResultSet executeQuery(String query) {
 		ResultSet result = null;
 		Connection connection = Connector.getConnection();
+		System.out.println("in executeQuery()");
 		
 		try {
 			Statement st = connection.createStatement();
