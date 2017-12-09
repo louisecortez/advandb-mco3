@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
 		logPanel = new JPanel();
 		
 		// Header Panel
-		headerPanel.setPreferredSize(new Dimension(dimensions.width, 50));
+		headerPanel.setPreferredSize(new Dimension(dimensions.width, 30));
 		headerPanel.add(lblNode);
 		pane.add(headerPanel, BorderLayout.PAGE_START);
 		headerPanel.setBackground(Color.white);
@@ -126,12 +126,16 @@ public class MainFrame extends JFrame {
 		cbReadRegion.setPreferredSize(new Dimension(200, 30));
 		cbReadRegion.setMaximumSize(new Dimension(200, 30));
 		btnAddRead.setPreferredSize(new Dimension(200, 30));
-		lblRead.setBorder(BorderFactory.createEmptyBorder(20, 0, 0 , 0));
-		lblLogs.setBorder(BorderFactory.createEmptyBorder(40, 0, 0 ,0));
+		lblRead.setBorder(BorderFactory.createEmptyBorder(0, 0, 0 , 0));
+		lblLogs.setBorder(BorderFactory.createEmptyBorder(20, 0, 0 ,0));
 		btnAddRead.setMaximumSize(new Dimension(200, 30));
+		JButton btnCommit = new JButton("Commit");
+		btnCommit.setPreferredSize(new Dimension(200, 30));
+		btnCommit.setMaximumSize(new Dimension(200, 30));
 		writePanel.add(lblRead);
 		writePanel.add(cbReadRegion);
 		writePanel.add(btnAddRead);
+		writePanel.add(btnCommit);
 		writePanel.add(lblLogs);
 		writePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		writePanel.setBackground(Color.WHITE);
@@ -150,11 +154,19 @@ public class MainFrame extends JFrame {
 		for(int i = 0; i < columns.length; i++) {
 	    	model.addColumn(columns[i]);
 	    }
-		addTableRow();
+		addTableRow(null);
+		addTableRow(null);
+		addTableRow(null);
+		addTableRow(null);
+		addTableRow(null);
+		addTableRow(null);
 		tableResults = new JTable(model);
-		
-		resultsPanel.add(tableResults);
-		pane.add(resultsPanel);
+		tableResults.setBounds(30,40,200,300);     
+		JScrollPane spTable = new JScrollPane(tableResults);
+		spTable.setPreferredSize(new Dimension(1100, 500));
+		resultsPanel.setBackground(Color.WHITE);
+		resultsPanel.add(spTable);
+		pane.add(resultsPanel, FlowLayout.LEADING);
 		
 		// Action Listeners
 		cbWrite.addActionListener(new ActionListener() {
@@ -209,6 +221,14 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
+		btnCommit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				taLogs.append("------------------------------------------\n");
+			}
+		});
+		
 		setTitle("Distributed Databases");
 		setSize(dimensions.width, dimensions.height);
 		setLocationRelativeTo(null);
@@ -226,11 +246,13 @@ public class MainFrame extends JFrame {
 		lblNode.setText(text);
 	}
 	
-	public void addTableRow() {
+	public void addTableRow(Object[] rowData) {
 		// Dynamic table
 		model.addRow(new Object[] {"ABW", "Aruba", "Latin America & Caribbean",
 				"IS.SHP.GCNW.XQ", "Liner shipping connectivity index (maximum value in 2004 = 100)",
 				"2004", "7.370000000000000"});
+		
+		//model.addRow(rowData);
 	}
 	
 	class WindowClose extends WindowAdapter{
