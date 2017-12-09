@@ -4,12 +4,15 @@ import controller.Controller;
 import dbconnection.Connector;
 
 import model.Entity;
-import model.Node;
+
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
  import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Connection;
@@ -35,6 +38,8 @@ public class Client {
 	private String dbName;
 	private int sharedPort = 12342; // change to shared port
 	private int portNo;
+	
+	private Connector connector;
 	
 	private volatile HashMap<String, ArrayList<Entity>> rsMap = new HashMap<>(); //results set of the query
 	private volatile HashMap<String, Connection> connectionsMap = new HashMap<>(); 
@@ -73,20 +78,33 @@ public class Client {
 					//servSocket.setSoTimeout(150000);
 				}
 				
-				new Thread(new NewThread()).start();
-				Socket inputSocket = new Socket(server, sharedPort);
-				DataOutputStream dos = new DataOutputStream(inputSocket.getOutputStream());
-				dos.writeUTF(clientName);
+				//new Thread(new NewThread()).start();
+				
+				//DataOutputStream dos = new DataOutputStream(inputSocket.getOutputStream());
+				//dos.writeUTF(clientName);
 				//dos.close();
-				inputSocket.close();
 				
 				mainFrame.setLabelNode(clientName + " (" + server + ")");
 				controller.setClient(this);
 				controller.setMainFrame(mainFrame);
 				
-				System.out.println("New node " + clientName + " with IP Address: " + server + " added to server.");
+				Socket inputSocket = new Socket("192.168.1.7", sharedPort);
+				PrintWriter pw = new PrintWriter(inputSocket.getOutputStream(), true);
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				
+				/*while(true) {
+					pw.println(br.readLine());
+				}*/
 				
+				//inputSocket.close();
+				
+				//System.out.println("New node " + clientName + " with IP Address: " + server + " added to server.");
+			}
+	
+			
+	
+			public void setConnector(Connector connector) {
+				this.connector = connector;
 			}
 			
 			public void setPassword(String password) {
