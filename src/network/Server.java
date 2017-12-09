@@ -1,12 +1,15 @@
 package network;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import com.sun.rowset.CachedRowSetImpl;
 
@@ -18,13 +21,16 @@ public class Server {
 	private ServerSocket ssAsiaAfrica;
 	private ServerSocket ssAllRegions;
 	
+	private ArrayList<ServerThread> servThreadList;
+	private ArrayList<String> IPList;
+	
 	private String ipEuropeAmerica = null;
 	private String ipAsiaAfrica = null;
 	private String ipAllRegions = null;
 	
 	private String SERVER_NAME = "Server";
 	
-	
+	Socket socket;
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		Server server = new Server();
 		//server.accept();
@@ -35,68 +41,166 @@ public class Server {
 	
 	public Server() throws IOException {
 		ssSharedSocket = new ServerSocket(12342);
+		servThreadList = new ArrayList<ServerThread>();
+		IPList = new ArrayList<String>();
 		ssEuropeAmerica = new ServerSocket(12352);
 		ssAsiaAfrica = new ServerSocket(12353);
 		ssAllRegions = new ServerSocket(12354);
 		
-		ssSharedSocket.setSoTimeout(20000);
+		/*ssSharedSocket.setSoTimeout(20000);
 		ssEuropeAmerica.setSoTimeout(20000);
 		ssAsiaAfrica.setSoTimeout(20000);
-		ssAllRegions.setSoTimeout(20000);
+		ssAllRegions.setSoTimeout(20000);*/
 	}
+	
+	
+	
+	public String getIpEuropeAmerica() {
+		return ipEuropeAmerica;
+	}
+
+	// added this
+	public void setIpEuropeAmerica(String ipEuropeAmerica) {
+		this.ipEuropeAmerica = ipEuropeAmerica;
+	}
+
+
+	public String getIpAsiaAfrica() {
+		return ipAsiaAfrica;
+	}
+
+
+	public void setIpAsiaAfrica(String ipAsiaAfrica) {
+		this.ipAsiaAfrica = ipAsiaAfrica;
+	}
+
+
+	public String getIpAllRegions() {
+		return ipAllRegions;
+	}
+
+
+	public void setIpAllRegions(String ipAllRegions) {
+		this.ipAllRegions = ipAllRegions;
+	}
+	
+	static String convertStreamToString(java.io.InputStream is) {
+	    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+	    return s.hasNext() ? s.next() : "";
+	}
+	//end of add
+	
 	
 	public void start() throws IOException {
 		// accept up to 3 nodes for the distributed database
 		int nodes = 0;
-		Socket socket;
+		
 		
 		System.out.println("Starting server...");
 		
-		while(nodes < 3) {
+		while(nodes < 1) {
+			System.out.println("start pa rin");
+			
 			socket = ssSharedSocket.accept();
+			
+			String client = convertStreamToString(socket.getInputStream());
+			
+			String clientName = client.trim();
+			System.out.println("client name is: " + clientName);
+			
 			String ip = socket.getInetAddress().getHostAddress();
-			DataInputStream dis = new DataInputStream(socket.getInputStream());
-			String clientName = dis.readUTF();
+			IPList.add(ip);
+			
 			
 			switch(clientName){
 			case "EuropeAmerica":
 				ipEuropeAmerica = ip;
 				System.out.println("EuropeAmerica connected!");
-				nodes++;
+				
 				break;
 			case "AsiaAfrica":
 				ipAsiaAfrica = ip;
 				System.out.println("AsiaAfrica connected!");
-				nodes++;
+				
 				break;
 			case "AllRegions":
 				ipAllRegions = ip;
 				System.out.println("AllRegions connected!");
-				nodes++;
+			
 				break;
 			}
-			System.out.println(clientName + " " + ip + " has connected to the server.");
 			
+			
+			nodes++;
+			
+			ServerThread s = new ServerThread(socket);
+			servThreadList.add(s);
+			s.start();
+			
+			System.out.println(socket.toString() + " has connected to the server.");
+			
+			
+			System.out.println("ipaddress is: " + ip);
+			//System.out.println("clientName is: " + clientName);
+			
+			 
 		}
+		
+		
 	}
 	
+	
 	public void serve() throws ClassNotFoundException {
+		System.out.println("serve na");
 		Socket curr;
 		while(true) {
 			try {
+				System.out.println("In the whie true loop");
 				curr = ssSharedSocket.accept();
-				DataInputStream dis = new DataInputStream(curr.getInputStream());
-				String message = dis.readUTF();
+				DataInputStream dis; //= new DataInputStream(curr.getInputStream());
+				//String blah = dis.readUTF();
+				String blah = convertStreamToString(curr.getInputStream());
+				String message = blah.trim();
+				System.out.println(message);
+				//String message;
+				//String curr;
+				/*
+				for (int i=0; i<servThreadList.size(); i++) {
+					message = servThreadList.get(i).getMessage();
+					curr = IPList.get(i);
+					
+					System.out.println("message from socket: " + message);
+					System.out.println("GOT " + message);
+					if(message.equals("EuropeAmerica")) {
+						ipEuropeAmerica = curr;
+						System.out.println("EuropeAmerica connected!");
+					} else if(message.equals("AsiaAfrica")) {
+						ipAsiaAfrica = curr;
+						System.out.println("AsiaAfrica connected!");
+					} else if(message.equals("AllRegions")) {
+						ipAllRegions = curr;
+						System.out.println("AllRegions connected!");
+					} else if(message.contains("has died")) {
+						if(message.startsWith("EuropeAmerica")) {
+							ipEuropeAmerica = null;
+						} else if(message.startsWith("AsiaAfrica")) {
+							ipAsiaAfrica = null;
+						} else if(message.startsWith("AllRegions")) {
+							ipAllRegions = null;
+						}
+				}
+				*/
+				System.out.println("message from socket: " + message);
 				System.out.println("GOT " + message);
 				if(message.equals("EuropeAmerica")) {
 					ipEuropeAmerica = curr.getInetAddress().getHostAddress();
 					System.out.println("EuropeAmerica connected!");
 				} else if(message.equals("AsiaAfrica")) {
 					ipAsiaAfrica = curr.getInetAddress().getHostAddress();
-					System.out.println("ipAsiaAfrica connected!");
+					System.out.println("AsiaAfrica connected!");
 				} else if(message.equals("AllRegions")) {
 					ipAllRegions = curr.getInetAddress().getHostAddress();
-					System.out.println("Central connected!");
+					System.out.println("AllRegions connected!");
 				} else if(message.contains("has died")) {
 					if(message.startsWith("EuropeAmerica")) {
 						ipEuropeAmerica = null;
@@ -108,6 +212,7 @@ public class Server {
 				} else {
 					String[] split = message.split("@");
 					switch(split[0]){
+						//first string in the array is the region
 						case "EuropeAmerica":
 							if(split[1].startsWith("SELECT")){
 								boolean retrieveSuccess = false;
@@ -145,7 +250,7 @@ public class Server {
 										System.out.println("Timed out. Attempting to retrieve data from AsiaAfrica...");
 									}
 								}
-								
+								//if no data was retrieved and there is an AsiaAfrica node
 								if(!retrieveSuccess && ipAsiaAfrica != null){ 
 									// send a request for data to AsiaAfrica
 									Socket data = new Socket(ipAsiaAfrica, 12352);
@@ -662,6 +767,7 @@ public class Server {
 			}
 		}
 	}
+	
 	
 	
 }
