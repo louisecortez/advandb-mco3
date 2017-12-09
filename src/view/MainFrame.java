@@ -384,18 +384,21 @@ public class MainFrame extends JFrame {
 		JLabel lblRead = new JLabel("Read");
 		JComboBox<String> cbReadRegion = new JComboBox<String>(new String[] {"All Regions", "Europe and America", "Asia and Africa"});
 		JButton btnAddRead = new JButton("Add Read");
+		JComboBox<String> cbTypeR = new JComboBox<String>(new String[] {"Local Main", "Local Replica", "Global"});
+		cbTypeR.setPreferredSize(new Dimension(200, 30));
+		cbTypeR.setMaximumSize(new Dimension(200, 30));
 		JLabel lblLogs = new JLabel("Log");
 		cbReadRegion.setPreferredSize(new Dimension(200, 30));
 		cbReadRegion.setMaximumSize(new Dimension(200, 30));
 		btnAddRead.setPreferredSize(new Dimension(200, 30));
-		lblRead.setBorder(BorderFactory.createEmptyBorder(0, 0, 0 , 0));
-		lblLogs.setBorder(BorderFactory.createEmptyBorder(20, 0, 0 ,0));
 		btnAddRead.setMaximumSize(new Dimension(200, 30));
 		JButton btnCommit = new JButton("Commit");
 		btnCommit.setPreferredSize(new Dimension(200, 30));
 		btnCommit.setMaximumSize(new Dimension(200, 30));
+		cbReadRegion.setEnabled(false);
 		writePanel.add(lblRead);
 		writePanel.add(cbReadRegion);
+		writePanel.add(cbTypeR);
 		writePanel.add(btnAddRead);
 		writePanel.add(btnCommit);
 		writePanel.add(lblLogs);
@@ -416,12 +419,6 @@ public class MainFrame extends JFrame {
 		for(int i = 0; i < columns.length; i++) {
 	    	model.addColumn(columns[i]);
 	    }
-		addTableRow(null);
-		addTableRow(null);
-		addTableRow(null);
-		addTableRow(null);
-		addTableRow(null);
-		addTableRow(null);
 		tableResults = new JTable(model);
 		tableResults.setBounds(30,40,200,300);     
 		JScrollPane spTable = new JScrollPane(tableResults);
@@ -442,6 +439,18 @@ public class MainFrame extends JFrame {
 					tfData.setEditable(true);
 				} else {
 					tfData.setEditable(false);
+				}
+			}
+		});
+		
+		cbTypeR.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if(cbTypeR.getSelectedIndex() == 0 || cbTypeR.getSelectedIndex() == 1) {
+					cbReadRegion.setEnabled(false);;
+				} else {
+					cbReadRegion.setEnabled(true);
 				}
 			}
 		});
@@ -479,16 +488,27 @@ public class MainFrame extends JFrame {
 				// TODO Auto-generated method stub
 				String log = cbReadRegion.getSelectedItem().toString();
 				
-				taLogs.append("Read " + log + "\n");
+				if(cbTypeR.getSelectedItem().toString().equals("Local Main") || 
+						cbTypeR.getSelectedItem().toString().equals("Local Replica")) {
+					log = "";
+				}
+				
+				taLogs.append(cbTypeR.getSelectedItem().toString() + " Read " + log + "\n");
 				
 				if(controller == null)
 					System.out.println("HELLO NULL");
 				
-				try {
-					controller.localRead("wdidb.all_regions");
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(cbTypeR.getSelectedItem().toString().equals("Local Main")) {
+					try {
+						controller.localRead("wdidb");
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if(cbTypeR.getSelectedItem().toString().equals("Local Replica")){
+					// local read replica
+				} else {
+					// global read
 				}
 			}
 		});
@@ -516,6 +536,11 @@ public class MainFrame extends JFrame {
 	
 	public void setLabelNode(String text) {
 		lblNode.setText(text);
+	}
+	
+	public void clearAllRows() {
+		DefaultTableModel model = (DefaultTableModel) tableResults.getModel();
+		model.setRowCount(0);
 	}
 	
 	public void addTableRow(Object[] rowData) {
