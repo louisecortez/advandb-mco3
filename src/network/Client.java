@@ -151,7 +151,6 @@ public class Client {
 			
 			/*
 			class NewThread implements Runnable{
-
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
@@ -164,7 +163,6 @@ public class Client {
 				    
 				    	
 				    if("READ".equals(command)) {
-
 				    	ReadTransaction transaction = new ReadTransaction();
 				    	//transaction.setIsolationLevel(Transaction.ISO_SERIALIZABLE);
 	            		//transaction.beginTransaction();
@@ -222,7 +220,6 @@ public class Client {
 				    	message.setCommand("UPDATE");
 				    	
 				    	String text = message.getText();
-
 				    	String updateInfo[] = text.split(",");
 				    	int id = Integer.parseInt(updateInfo[0].substring(3));
 				    	int value = Integer.parseInt(updateInfo[1].substring(6));
@@ -237,7 +234,6 @@ public class Client {
 					x.printStackTrace();
 					
 				}
-
 					
 				}
 				
@@ -339,7 +335,6 @@ public class Client {
 					}
 					addTransaction();
 				}
-
 				private String theOther(String client) {
 					switch(client){
 						case "EuropeAmerica": return "AsiaAfrica";
@@ -385,7 +380,6 @@ public class Client {
 //			}
 			
 			class IncomingThread implements Runnable{
-
 				@Override
 				public void run() {
 					while (true) {
@@ -643,7 +637,6 @@ public class Client {
 				dos.close();
 				sk.close();
 			}
-
 			public void doneWriting() {
 				boolean doneWriting = true;
 				for(String key : writeFinishMap.keySet()) {
