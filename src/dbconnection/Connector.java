@@ -3,7 +3,8 @@ package dbconnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;	
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 
@@ -14,6 +15,10 @@ public class Connector {
 	private static String driver;
 	private static String username;
 	private static String password;
+	
+	private static String ipAllRegions = null;
+	private static String ipEuropeAmerica = null;
+	private static String ipAsiaAfrica = null;
 	
 	public Connector(String dbName) {
 		try {
@@ -70,16 +75,33 @@ public class Connector {
 		return connection;
 	}
 	
-	public static void executeStatement(String statement) {
+	public static void executeStatement(String statement) throws SQLException {
 		Connection connection = getConnection();
 		System.out.println("in executeStatement()");
 		
+		PreparedStatement ps = connection.prepareStatement("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
+		connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+		
 		try {
+			connection.setAutoCommit(false);
 			PreparedStatement pst = connection.prepareStatement(statement);
 			pst.execute(statement);
-			connection.close();
 		} catch(Exception e) {
 			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				connection.setAutoCommit(true);
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -89,10 +111,24 @@ public class Connector {
 		System.out.println("in executeQuery()");
 		
 		try {
+			connection.setAutoCommit(false);
 			Statement st = connection.createStatement();
 			result = st.executeQuery(query);
 		} catch(Exception e) {
 			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return result;
