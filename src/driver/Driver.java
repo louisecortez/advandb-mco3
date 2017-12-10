@@ -13,8 +13,8 @@ public class Driver {
 			//Server s = new Server();
 			Controller c = new Controller();
 			new FrameIPAddress(c);
-			new FrameIPAddress(c);
-			new FrameIPAddress(c);
+			//new FrameIPAddress(c);
+			//new FrameIPAddress(c);
 			//s.accept();
 			
 			/*
