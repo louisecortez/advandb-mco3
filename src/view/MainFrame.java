@@ -356,7 +356,7 @@ public class MainFrame extends JFrame {
 		JTextField tfYear = new JTextField();
 		JLabel lblData = new JLabel("Data");
 		JTextField tfData = new JTextField();
-		JComboBox<String> cbType = new JComboBox<String>(new String[] {"Local", "Global"});
+		JComboBox<String> cbType = new JComboBox<String>(new String[] {"Local", "Global", "All Regions", "Europe and America", "Asia and Africa"});
 		JButton btnAddTrans = new JButton("Add Write");
 		cbWrite.setPreferredSize(new Dimension(200, 30));
 		cbWrite.setMaximumSize(new Dimension(200, 30));
@@ -469,6 +469,8 @@ public class MainFrame extends JFrame {
 				if(cbWrite.getSelectedItem().toString().equals("Update")
 						|| cbWrite.getSelectedItem().toString().equals("Insert")) {
 					log = log + " with Data: " + tfData.getText();
+				} else {
+					tfData.setText("0");
 				}
 				
 				log += "\n";
