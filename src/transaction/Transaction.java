@@ -3,12 +3,27 @@ package transaction;
 import dbconnection.Connector;
 
 public class Transaction {
+	protected String transaction;
+	protected String transType;
 
-	// commmon methods here
+	public Transaction(String transaction, String transType) {
+		this.transaction = transaction;
+		this.transType = transType;
+	}
 	
-	protected Connector dbconnection;
-	
-	public Transaction(Connector dbconnection) {
-		this.dbconnection = dbconnection;
+	public String getTransaction() {
+		return transaction;
+	}
+
+	public void setTransaction(String transaction) {
+		this.transaction = transaction;
+	}
+
+	public String getTransType() {
+		return transType;
+	}
+
+	public void setTransType(String transType) {
+		this.transType = transType;
 	}
 }

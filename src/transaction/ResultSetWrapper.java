@@ -1,4 +1,4 @@
-package model;
+package transaction;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
