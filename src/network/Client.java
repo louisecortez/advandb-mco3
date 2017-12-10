@@ -5,6 +5,9 @@ import dbconnection.Connector;
 
 import model.Entity;
 
+import transaction.ReadTransaction;
+import transaction.WriteTransaction;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -39,8 +42,6 @@ public class Client {
 	private int sharedPort = 12342; // change to shared port
 	private int portNo;
 	
-	private Connector connector;
-	
 	private volatile HashMap<String, ArrayList<Entity>> rsMap = new HashMap<>(); //results set of the query
 	private volatile HashMap<String, Connection> connectionsMap = new HashMap<>(); 
 	private volatile HashMap<String, String> writeMap = new HashMap<>();
@@ -51,9 +52,16 @@ public class Client {
 	private MainFrame mainFrame;// gui per client
 	private Controller controller;
 	
+	private Connector connector;
+	Socket inputSocket;
+	
 	public Client(String server, String clientName, Controller controller) throws IOException {
 		
 				this.mainFrame = new MainFrame();
+				mainFrame.setLabelNode(clientName + " (" + server + ")");
+				controller.setClient(this);
+				controller.setMainFrame(mainFrame);
+				
 		 		this.server = server;
 		 		this.clientName = clientName;
 				this.controller = controller;
@@ -78,38 +86,52 @@ public class Client {
 					//servSocket.setSoTimeout(150000);
 				}
 				
-				//new Thread(new NewThread()).start();
+				new Thread(new NewThread()).start();
 				
-				//DataOutputStream dos = new DataOutputStream(inputSocket.getOutputStream());
-				//dos.writeUTF(clientName);
-				//dos.close();
 				
-				mainFrame.setLabelNode(clientName + " (" + server + ")");
-				controller.setClient(this);
-				controller.setMainFrame(mainFrame);
 				
-				Socket inputSocket = new Socket("192.168.1.7", sharedPort);
-				PrintWriter pw = new PrintWriter(inputSocket.getOutputStream(), true);
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				
+				
+				inputSocket = new Socket("192.168.1.4", sharedPort);
+				
+				DataOutputStream dos = new DataOutputStream(inputSocket.getOutputStream());
+				dos.writeUTF(clientName);
+				dos.close();
+				
+				
+				//PrintWriter pw = new PrintWriter(inputSocket.getOutputStream(), true);
+				//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));				
+				
+				//pw.println(clientName);
 				/*while(true) {
-					pw.println(br.readLine());
-				}*/
+					
+				}
+				*/
 				
 				//inputSocket.close();
 				
 				//System.out.println("New node " + clientName + " with IP Address: " + server + " added to server.");
+				
+				
 			}
 	
-			
-	
-			public void setConnector(Connector connector) {
+	public void setConnector(Connector connector) {
 				this.connector = connector;
-			}
+	}
 			
+	public String getClientName() {
+		return clientName;
+	}
+		
+	public String getIP() {
+		return server;
+	}
+	
+	
 			public void setPassword(String password) {
 				this.password = password;
 			}
+			
 			
 			class NewThread implements Runnable {
 				@Override
@@ -126,6 +148,102 @@ public class Client {
 				}
 			}
 			
+			
+			/*
+			class NewThread implements Runnable{
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					try {
+					ObjectInputStream ois = new ObjectInputStream(inputSocket.getInputStream());
+					Message message = (Message) ois.readObject();
+				    
+				    String sender = message.getSender();
+					String command = message.getCommand();
+				    
+				    	
+				    if("READ".equals(command)) {
+
+				    	ReadTransaction transaction = new ReadTransaction();
+				    	//transaction.setIsolationLevel(Transaction.ISO_SERIALIZABLE);
+	            		//transaction.beginTransaction();
+	            		ResultSet rs = transaction.transactionBody(clientName, 0, 0, 0);
+	            		//transaction.endTransaction(10);
+	            		
+	            		
+	            		
+	            		CachedRowSetImpl crs = new CachedRowSetImpl();
+	            		crs.populate(rs);
+	            		
+	            		controller.sendMessage(new Message(clientName, "READRESPONSE", sender, crs));
+				    	
+				    	
+				    	//c.SEND("<Palawan>(READRESPONSE)[{}]");
+				    }
+				    else if("READRESPONSE".equals(command)) {
+				    	System.out.println("i sent the response");
+				    	System.out.println("i figure out who sent me and i add/concatenate stuff here");
+				    	
+				    	controller.readResponseAction(message);
+				    	
+				    }
+				    else if("UPDATE".equals(command)) {
+				    	String text = message.getText();
+				    	String targetLocation = message.getSender();
+				    	int householdNum = 0;
+				    	if("EuropeAmerica".equals(targetLocation)) {
+				    		householdNum = 12352; 
+				    	}
+				    	else if("AsiaAfrica".equals(targetLocation)) {
+				    		householdNum = 12353;
+				    	}
+				    	
+				    	System.out.println("Command: UPDATE " + text);
+				    	String updateInfo[] = text.split(",");
+				    	int id = Integer.parseInt(updateInfo[0].substring(3));
+				    	int value = Integer.parseInt(updateInfo[1].substring(6));
+				    	
+				    	WriteTransaction transaction = new WriteTransaction();
+				    	transaction.setIsolationLevel(4);
+				    	transaction.beginTransaction();
+				    	transaction.transactionBody(clientName, id, value, householdNum);
+				    	transaction.endTransaction(10);
+				    	
+				    	sender = message.getOriginalSender();
+				    	
+				    	controller.sendMessage(new Message(clientName, "UPDATERESPONSE", sender, "OK"));	
+				    }
+				    else if("UPDATERESPONSE".equals(command)) {
+				    	System.out.println("I got an UPDATE RESPONSE");
+				    	controller.writeResponseAction(message);
+				    }
+				    else if("TOCENTRALUPDATE".equals(command)) {
+				    	message.setCommand("UPDATE");
+				    	
+				    	String text = message.getText();
+
+				    	String updateInfo[] = text.split(",");
+				    	int id = Integer.parseInt(updateInfo[0].substring(3));
+				    	int value = Integer.parseInt(updateInfo[1].substring(6));
+				    	
+				    	controller.writeGlobal(4, message.getSender(), id, value);
+				    	
+				    }
+				    
+				    
+				}
+				catch(Exception x){
+					x.printStackTrace();
+					
+				}
+
+					
+				}
+				
+			}
+			*/
+			/*
 			public void case1(ArrayList<String> transactions) throws Exception {
 //				nRunningTransactions = 0;
 				ArrayList<Thread> threads = new ArrayList<>();
@@ -541,5 +659,6 @@ public class Client {
 					//mainFrame.enableComboBox();
 				}
 			}
+			*/
 
 }
