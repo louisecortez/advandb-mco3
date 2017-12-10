@@ -22,7 +22,7 @@ public class Connector {
 			e.printStackTrace();
 		}
 		this.driver = "com.mysql.jdbc.Connector"; //com.mysql.jdbc.DriverManager
-		this.url = "jdbc:mysql://localhost:3306/"; //jdbc.mysql://127.0.0.1:3306/
+		//this.url = "jdbc:mysql://192.168.1.4:3306/"; //jdbc.mysql://127.0.0.1:3306/
 		this.schema = dbName; //db_hpq
 		this.username = "root"; //root
 		this.password = "1234";
@@ -45,10 +45,14 @@ public class Connector {
 			e.printStackTrace();
 		}
 		this.schema = "com.mysql.jdbc.Connector"; //com.mysql.jdbc.DriverManager
-		this.url = "jdbc:mysql://localhost:3306/"; //jdbc.mysql://127.0.0.1:3306/
+		//this.url = "jdbc:mysql://192.168.1.4:3306/"; //jdbc.mysql://127.0.0.1:3306/
 		this.schema = schema; //db_hpq
 		this.username = "root"; //root
 		this.password = password;
+	}
+	
+	public void setURL(String url) {
+		this.url = url;
 	}
 
 	
@@ -68,6 +72,7 @@ public class Connector {
 	
 	public static void executeStatement(String statement) {
 		Connection connection = getConnection();
+		System.out.println("in executeStatement()");
 		
 		try {
 			PreparedStatement pst = connection.prepareStatement(statement);
