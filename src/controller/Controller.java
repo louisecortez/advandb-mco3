@@ -97,29 +97,102 @@ public class Controller {
 		String query = null;
 		int nYear = Integer.parseInt(year);
 		double nData = Double.parseDouble(data);
-		
-		if(writeType.equals("Update")) {
-			query = QueryGenerator.generateUpdate(table, country, series, nYear, nData);
-		} else if(writeType.equals("Insert")) {
-			query = QueryGenerator.generateInsert(table, country, series, nYear, nData);
-		} else if(writeType.equals("Delete")) {
-			query = QueryGenerator.generateDelete(table, country, series, nYear, nData);
-		}
+		String regionTemp = null;
 		
 		if(type.equals("Local")) {
+			if(writeType.equals("Update")) {
+				query = QueryGenerator.generateUpdate(region, country, series, nYear, nData);
+			} else if(writeType.equals("Insert")) {
+				query = QueryGenerator.generateInsert(region, country, series, nYear, nData);
+			} else if(writeType.equals("Delete")) {
+				query = QueryGenerator.generateDelete(region, country, series, nYear, nData);
+			}
+			
 			transQueue.add(new WriteTransaction(query, region));
-		} else {
+		} else if(type.equals("Global")){
+			if(writeType.equals("Update")) {
+				query = QueryGenerator.generateUpdate(region, country, series, nYear, nData);
+			} else if(writeType.equals("Insert")) {
+				query = QueryGenerator.generateInsert(region, country, series, nYear, nData);
+			} else if(writeType.equals("Delete")) {
+				query = QueryGenerator.generateDelete(region, country, series, nYear, nData);
+			}
 			transQueue.add(new WriteTransaction(query, region));
+			
 			if(region.equals(Client.FIRST_NODE)) {
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.SECOND_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.SECOND_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.SECOND_NODE, country, series, nYear, nData);
+				}
+				
 				transQueue.add(new WriteTransaction(query, Client.SECOND_NODE));
+				
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.THIRD_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.THIRD_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.THIRD_NODE, country, series, nYear, nData);
+				}
 				transQueue.add(new WriteTransaction(query, Client.THIRD_NODE));
 			} else if(region.equals(Client.SECOND_NODE)) {
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.FIRST_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.FIRST_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.FIRST_NODE, country, series, nYear, nData);
+				}
 				transQueue.add(new WriteTransaction(query, Client.FIRST_NODE));
+				
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.THIRD_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.THIRD_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.THIRD_NODE, country, series, nYear, nData);
+				}
 				transQueue.add(new WriteTransaction(query, Client.THIRD_NODE));
 			} else if(region.equals(Client.THIRD_NODE)) {
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.FIRST_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.FIRST_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.FIRST_NODE, country, series, nYear, nData);
+				}
 				transQueue.add(new WriteTransaction(query, Client.FIRST_NODE));
+				
+				if(writeType.equals("Update")) {
+					query = QueryGenerator.generateUpdate(Client.SECOND_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Insert")) {
+					query = QueryGenerator.generateInsert(Client.SECOND_NODE, country, series, nYear, nData);
+				} else if(writeType.equals("Delete")) {
+					query = QueryGenerator.generateDelete(Client.SECOND_NODE, country, series, nYear, nData);
+				}
 				transQueue.add(new WriteTransaction(query, Client.SECOND_NODE));
 			}
+		} else {
+			if(type.equals("All Regions")) {
+				regionTemp = Client.THIRD_NODE;
+			} else if(type.equals("Europe and America")) {
+				regionTemp = Client.FIRST_NODE;
+			} else if(type.equals("Asia and Africa")) {
+				regionTemp = Client.SECOND_NODE;
+			}
+			
+			if(writeType.equals("Update")) {
+				query = QueryGenerator.generateUpdate(regionTemp, country, series, nYear, nData);
+			} else if(writeType.equals("Insert")) {
+				query = QueryGenerator.generateInsert(regionTemp, country, series, nYear, nData);
+			} else if(writeType.equals("Delete")) {
+				query = QueryGenerator.generateDelete(regionTemp, country, series, nYear, nData);
+			}
+			
+			transQueue.add(new WriteTransaction(query, regionTemp));
 		}
 	}
 	
@@ -154,13 +227,14 @@ public class Controller {
 		
 		for(int i = 0; i < transQueue.size(); i++) {
 			if(transQueue.get(i).getTransType().equals("Local")) {
-				connector.setURL(client.getIP());
+				connector.setURL("jdbc:mysql://" + client.getIP() + ":3306/");
 			} else if(transQueue.get(i).getTransType().equals(Client.FIRST_NODE)) {
-				connector.setURL(server.getIpEuropeAmerica());
+				if(server == null)
+				connector.setURL("jdbc:mysql://" + client.getIP() + ":3306/");
 			} else if(transQueue.get(i).getTransType().equals(Client.SECOND_NODE)) {
-				connector.setURL(server.getIpAsiaAfrica());
+				connector.setURL("jdbc:mysql://10.100.200.107:3306/");
 			} else if(transQueue.get(i).getTransType().equals(Client.THIRD_NODE)) {
-				connector.setURL(server.getIpAllRegions());
+				connector.setURL("jdbc:mysql://10.100.201.63:3306/");
 			}
 			
 			if(transQueue.get(i) instanceof ReadTransaction) {
