@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
 	private Dimension dimensions = Toolkit.getDefaultToolkit().getScreenSize();
@@ -384,7 +385,7 @@ public class MainFrame extends JFrame {
 		JLabel lblRead = new JLabel("Read");
 		JComboBox<String> cbReadRegion = new JComboBox<String>(new String[] {"All Regions", "Europe and America", "Asia and Africa"});
 		JButton btnAddRead = new JButton("Add Read");
-		JComboBox<String> cbTypeR = new JComboBox<String>(new String[] {"Local Main", "Local Replica", "Global"});
+		JComboBox<String> cbTypeR = new JComboBox<String>(new String[] {"Local Main", "Replica", "Global"});
 		cbTypeR.setPreferredSize(new Dimension(200, 30));
 		cbTypeR.setMaximumSize(new Dimension(200, 30));
 		JLabel lblLogs = new JLabel("Log");
@@ -392,7 +393,7 @@ public class MainFrame extends JFrame {
 		cbReadRegion.setMaximumSize(new Dimension(200, 30));
 		btnAddRead.setPreferredSize(new Dimension(200, 30));
 		btnAddRead.setMaximumSize(new Dimension(200, 30));
-		JButton btnCommit = new JButton("Commit");
+		JButton btnCommit = new JButton("Execute");
 		btnCommit.setPreferredSize(new Dimension(200, 30));
 		btnCommit.setMaximumSize(new Dimension(200, 30));
 		cbReadRegion.setEnabled(false);
@@ -408,7 +409,7 @@ public class MainFrame extends JFrame {
 
 		// Log Panel
 		logPanel.setLayout(new FlowLayout());
-		JTextArea taLogs = new JTextArea("Write PHILIPPINES, Series, 2018, DATA\n", 9, 200);
+		JTextArea taLogs = new JTextArea("", 9, 200);
 		taLogs.setEditable(false);
 		JScrollPane spLogs = new JScrollPane(taLogs);
 		logPanel.add(spLogs);
@@ -474,11 +475,10 @@ public class MainFrame extends JFrame {
 				
 				taLogs.append(log);
 				
-				if(cbType.getSelectedItem().toString().equals("Local")) {
-					// controller.localWrite
-				} else {
-					// controller.globalRead
-				}
+				controller.addWriteQuery("dbmco3", cbType.getSelectedItem().toString(), cbWrite.getSelectedItem().toString(),
+						cbCountry.getSelectedItem().toString(), cbSeries.getSelectedItem().toString() + ", ",
+						tfYear.getText(), tfData.getText());
+				
 			}
 		});
 		
@@ -489,7 +489,7 @@ public class MainFrame extends JFrame {
 				String log = cbReadRegion.getSelectedItem().toString();
 				
 				if(cbTypeR.getSelectedItem().toString().equals("Local Main") || 
-						cbTypeR.getSelectedItem().toString().equals("Local Replica")) {
+						cbTypeR.getSelectedItem().toString().equals("Replica")) {
 					log = "";
 				}
 				
@@ -499,16 +499,21 @@ public class MainFrame extends JFrame {
 					System.out.println("HELLO NULL");
 				
 				if(cbTypeR.getSelectedItem().toString().equals("Local Main")) {
-					try {
-						controller.localRead("wdidb");
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if(cbTypeR.getSelectedItem().toString().equals("Local Replica")){
-					// local read replica
+					controller.addReadQuery("dbmco3", "Local");
+				} else if(cbTypeR.getSelectedItem().toString().equals("Replica")){
+					// read replica
 				} else {
-					// global read
+					String region = null;
+					
+					if(cbReadRegion.getSelectedItem().toString().equals("All Regions")) {
+						region = Client.THIRD_NODE;
+					} else if(cbReadRegion.getSelectedItem().toString().equals("Europe and America")) {
+						region = Client.FIRST_NODE;
+					} else if(cbReadRegion.getSelectedItem().toString().equals("Asia and Africa")) {
+						region = Client.SECOND_NODE;
+					}
+					
+					controller.addReadQuery("dbmco3", region);
 				}
 			}
 		});
@@ -517,6 +522,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				controller.executeQueries();
 				taLogs.append("------------------------------------------\n");
 			}
 		});
@@ -544,11 +550,6 @@ public class MainFrame extends JFrame {
 	}
 	
 	public void addTableRow(Object[] rowData) {
-		// Dynamic table
-//		model.addRow(new Object[] {"ABW", "Aruba", "Latin America & Caribbean",
-//				"IS.SHP.GCNW.XQ", "Liner shipping connectivity index (maximum value in 2004 = 100)",
-//				"2004", "7.370000000000000"});
-//		
 		model.addRow(rowData);
 	}
 	
